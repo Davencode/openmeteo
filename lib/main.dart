@@ -27,14 +27,24 @@ class OpenMeteoApiClient {
 }*/
 
 class OpenMeteoApiClient {
-  final String baseUrl = 'https://api.open-meteo.com/v1';
-  String latitude;
-  String longitude;
 
-  OpenMeteoApiClient({this.latitude = '41.9027835', this.longitude = '12.4963655'});
+  //Variables
+  final String baseUrl = 'https://api.open-meteo.com/v1';
+  String? latitude;
+  String? longitude;
+
+  //OpenMeteoApiClient({this.latitude = '41.9027835', this.longitude = '12.4963655'});
 
   Future<MeteoAPI> fetchMeteoData() async {
     if (latitude == null || longitude == null) {
+
+      /* If you comment the following two lines of code
+      you'll obtain the new latitude and longitude values from
+      your current position */
+
+      latitude = '41.9027835';
+      longitude = '12.4963655';
+
       // Ottieni la posizione corrente se le coordinate non sono state fornite.
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
@@ -52,6 +62,7 @@ class OpenMeteoApiClient {
       final MeteoAPI meteoData = MeteoAPI.fromJson(jsonMap);
 
       return meteoData;
+
     } else {
       throw Exception('Failed to load Meteo data');
     }
@@ -67,21 +78,25 @@ class MeteoDisplayWidget extends StatelessWidget {
       future: OpenMeteoApiClient().fetchMeteoData(),
       builder: (context, snapshot) {
 
+        //Variables
         final DateTime now = DateTime.now();
         final String currentTime = DateFormat('HH:mm').format(now);
         String imagePath;
         final List<Map<String, dynamic>> jsonData; // Dichiarazione di jsonData come attributo
 
+        /* If statement that define that we are actually to morning or night and change
+        in a correct way the values of the image */
+
         if (currentTime.compareTo('06:00') >= 0 && currentTime.compareTo('18:00') <= 0) {
-          // È giorno cambia immagine con il meteo mattutino
-          imagePath = 'assets/day_image.png'; // Percorso dell'immagine per il giorno
+          imagePath = 'assets/day_image.png';
         } else {
-          // È notte cambia immagine con il meteo notturno
-          imagePath = 'assets/night_image.png'; // Percorso dell'immagine per la notte
+          imagePath = 'assets/night_image.png';
         }
 
+        //Check connectionState -> if we have data we load it, otherwise CircularProgressIndicator()
+
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (snapshot.hasData) {
@@ -93,26 +108,26 @@ class MeteoDisplayWidget extends StatelessWidget {
           return Container(
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('assets/cityMinimal.jpeg'), // Imposta il percorso dell'immagine
-                    fit: BoxFit.cover, // Regola la modalità di riempimento dell'immagine
+                    image: AssetImage('assets/cityMinimal.jpeg'),
+                    fit: BoxFit.cover,
                   ),
                 ),
             child: Center(
-              child: // Spazio vuoto per spostare la card in alto
+              child:
               Column(
                 children: [
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Card(
                     elevation: 20, // Altezza dell'ombra
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15.0), // Bordo rotondo
+                      borderRadius: BorderRadius.circular(15.0),
                     ),
                     child: Container(
-                      width: 400, // Larghezza della card
-                      padding: EdgeInsets.all(30),
+                      width: 400, //
+                      padding: const EdgeInsets.all(30),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [Colors.blueAccent!, Colors.yellowAccent[100]!], // Sfumatura grigia
+                          colors: [Colors.blueAccent!, Colors.yellowAccent[100]!],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -121,7 +136,7 @@ class MeteoDisplayWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           Image.asset(
-                            imagePath, // Utilizza il percorso dell'immagine
+                            imagePath,
                             width: 100,
                             height: 100,
                           ),
@@ -134,20 +149,24 @@ class MeteoDisplayWidget extends StatelessWidget {
                   ),
 
                   Container(
-                    constraints: BoxConstraints(maxHeight: 240), // Imposta un'altezza massima
+                    constraints: const BoxConstraints(maxHeight: 240),
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: meteoData.hourly?.time?.length ?? 0,
                       itemBuilder: (context, index) {
+
+                        //Variables
                         String? rawDateTime = meteoData.hourly?.time?[index];
                         if (rawDateTime != null) {
+
+                          //Convert date with the formay yyyy/mm/dd and Timezone with pattern hh:mm
                           DateTime dateTime = DateTime.parse(rawDateTime);
                           String formattedDateTime = "${dateTime.year}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.day.toString().padLeft(2, '0')}";
                           String formattedTimeZone = "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
 
                           return Container(
                             width: 150,
-                            margin: EdgeInsets.all(10),
+                            margin: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               color: imagePath == 'day_night' ? Colors.white70 : Colors.blueAccent,
                               borderRadius: BorderRadius.circular(16.0), // Imposta i bordi tondeggianti
@@ -156,7 +175,7 @@ class MeteoDisplayWidget extends StatelessWidget {
                                   color: Colors.yellowAccent.withOpacity(0.5),
                                   spreadRadius: 1,
                                   blurRadius: 5,
-                                  offset: Offset(0, 3),
+                                  offset: const Offset(0, 3),
                                 ),
                               ],
                             ),
@@ -164,11 +183,11 @@ class MeteoDisplayWidget extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Padding(
-                                  padding: EdgeInsets.all(10.0),
+                                  padding: const EdgeInsets.all(10.0),
                                   child: Image.asset(
                                     imagePath,
                                     scale: 3,
-                                  ), // Sostituisci con il percorso dell'immagine desiderata
+                                  ),
                                 ),
                                 Column(
                                   children: [
@@ -179,14 +198,14 @@ class MeteoDisplayWidget extends StatelessWidget {
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    Text('$formattedDateTime'),
+                                    Text(formattedDateTime),
                                     const Divider(),
                                     const Text(
                                         'Orario previsto',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                         )),
-                                    Text('$formattedTimeZone'),
+                                    Text(formattedTimeZone),
                                     const Divider(),
                                     const Text(
                                         'Temperature',
@@ -200,7 +219,7 @@ class MeteoDisplayWidget extends StatelessWidget {
                             ),
                           );
                         } else {
-                          return SizedBox.shrink(); // Nel caso la data sia null, la card sarà invisibile
+                          return const SizedBox.shrink();
                         }
                       },
                     ),
@@ -210,25 +229,22 @@ class MeteoDisplayWidget extends StatelessWidget {
             ),
           );
         } else {
-          return Center(child: Text('No data available'));
+          return const Center(child: Text('No data available'));
         }
       },
-
     );
-
   }
-
 }
 
 void main() {
   runApp(MaterialApp(
     home: Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
             'Challenge Weather API',
             style: TextStyle(
-              color: Colors.black, // Imposta il colore del testo in nero
-              fontWeight: FontWeight.w300, // Imposta il testo in grassetto
+              color: Colors.black,
+              fontWeight: FontWeight.w300,
             ),
         ),
         backgroundColor: Colors.lime,
@@ -250,7 +266,7 @@ void main() {
             print('$latitude,$longitude');
 
           },
-          child: Icon(Icons.location_on),
+          child: const Icon(Icons.location_on),
         ),
       body: MeteoDisplayWidget(),
     ),
