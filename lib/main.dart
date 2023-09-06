@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'weatherModel.dart';
 import 'package:intl/intl.dart';
+import 'package:geolocator/geolocator.dart';
 
 
+/*
 class OpenMeteoApiClient {
   final String baseUrl = 'https://api.open-meteo.com/v1';
   String latitude = '41.9027835';
@@ -22,7 +24,40 @@ class OpenMeteoApiClient {
       throw Exception('Failed to load Meteo data');
     }
   }
+}*/
+
+class OpenMeteoApiClient {
+  final String baseUrl = 'https://api.open-meteo.com/v1';
+  String latitude;
+  String longitude;
+
+  OpenMeteoApiClient({this.latitude = '41.9027835', this.longitude = '12.4963655'});
+
+  Future<MeteoAPI> fetchMeteoData() async {
+    if (latitude == null || longitude == null) {
+      // Ottieni la posizione corrente se le coordinate non sono state fornite.
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      latitude = position.latitude.toString();
+      longitude = position.longitude.toString();
+    }
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/forecast?latitude=$latitude&longitude=$longitude&hourly=temperature_2m'),
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonMap = json.decode(response.body);
+      final MeteoAPI meteoData = MeteoAPI.fromJson(jsonMap);
+
+      return meteoData;
+    } else {
+      throw Exception('Failed to load Meteo data');
+    }
+  }
 }
+
 
 class MeteoDisplayWidget extends StatelessWidget {
 
@@ -36,7 +71,6 @@ class MeteoDisplayWidget extends StatelessWidget {
         final String currentTime = DateFormat('HH:mm').format(now);
         String imagePath;
         final List<Map<String, dynamic>> jsonData; // Dichiarazione di jsonData come attributo
-
 
         if (currentTime.compareTo('06:00') >= 0 && currentTime.compareTo('18:00') <= 0) {
           // È giorno cambia immagine con il meteo mattutino
@@ -138,23 +172,23 @@ class MeteoDisplayWidget extends StatelessWidget {
                                 ),
                                 Column(
                                   children: [
-                                    Divider(),
-                                    Text(
+                                    const Divider(),
+                                    const Text(
                                       'Time',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                     Text('$formattedDateTime'),
-                                    Divider(),
-                                    Text(
+                                    const Divider(),
+                                    const Text(
                                         'Orario previsto',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                         )),
                                     Text('$formattedTimeZone'),
-                                    Divider(),
-                                    Text(
+                                    const Divider(),
+                                    const Text(
                                         'Temperature',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
@@ -169,22 +203,19 @@ class MeteoDisplayWidget extends StatelessWidget {
                           return SizedBox.shrink(); // Nel caso la data sia null, la card sarà invisibile
                         }
                       },
-                    )
-
-                    ,
+                    ),
                   )
-
                 ],
               ),
-
-
             ),
           );
         } else {
           return Center(child: Text('No data available'));
         }
       },
+
     );
+
   }
 
 }
@@ -201,9 +232,26 @@ void main() {
             ),
         ),
         backgroundColor: Colors.lime,
-
       ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () async {
 
+            var data = OpenMeteoApiClient();
+            var latitude = '';
+            var longitude = '';
+
+            data.fetchMeteoData();
+            final position = await Geolocator.getCurrentPosition(
+              desiredAccuracy: LocationAccuracy.high,
+            );
+            latitude = position.latitude.toString();
+            longitude = position.longitude.toString();
+
+            print('$latitude,$longitude');
+
+          },
+          child: Icon(Icons.location_on),
+        ),
       body: MeteoDisplayWidget(),
     ),
   ));
