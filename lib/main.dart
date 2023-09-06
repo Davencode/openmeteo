@@ -67,15 +67,15 @@ class MeteoDisplayWidget extends StatelessWidget {
               child: // Spazio vuoto per spostare la card in alto
               Column(
                 children: [
-                  SizedBox(height: 50),
+                  SizedBox(height: 20),
                   Card(
                     elevation: 20, // Altezza dell'ombra
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15.0), // Bordo rotondo
                     ),
                     child: Container(
-                      width: 300, // Larghezza della card
-                      padding: EdgeInsets.all(20),
+                      width: 400, // Larghezza della card
+                      padding: EdgeInsets.all(30),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [Colors.blueAccent!, Colors.yellowAccent[100]!], // Sfumatura grigia
@@ -98,22 +98,80 @@ class MeteoDisplayWidget extends StatelessWidget {
                       ),
                     ),
                   ),
+
                   Container(
-                    constraints: BoxConstraints(maxHeight: 200), // Imposta un'altezza massima
+                    constraints: BoxConstraints(maxHeight: 240), // Imposta un'altezza massima
                     child: ListView.builder(
-                      shrinkWrap: true,
-                      physics: ClampingScrollPhysics(),
-                      itemCount: meteoData.hourly?.time?.length ?? 0, // Usa la lunghezza di meteoData.time
+                      scrollDirection: Axis.horizontal,
+                      itemCount: meteoData.hourly?.time?.length ?? 0,
                       itemBuilder: (context, index) {
-                        return Card(
-                          margin: EdgeInsets.all(10),
-                          child: ListTile(
-                            title: Text('Time: ${meteoData.hourly?.temperature2m?[index]}'),
-                            subtitle: Text('Temperature 2m: ${meteoData.hourly?.temperature2m?[index]}'),
-                          ),
-                        );
+                        String? rawDateTime = meteoData.hourly?.time?[index];
+                        if (rawDateTime != null) {
+                          DateTime dateTime = DateTime.parse(rawDateTime);
+                          String formattedDateTime = "${dateTime.year}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.day.toString().padLeft(2, '0')}";
+                          String formattedTimeZone = "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
+
+                          return Container(
+                            width: 150,
+                            margin: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: imagePath == 'day_night' ? Colors.white70 : Colors.blueAccent,
+                              borderRadius: BorderRadius.circular(16.0), // Imposta i bordi tondeggianti
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.yellowAccent.withOpacity(0.5),
+                                  spreadRadius: 1,
+                                  blurRadius: 5,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.all(10.0),
+                                  child: Image.asset(
+                                    imagePath,
+                                    scale: 3,
+                                  ), // Sostituisci con il percorso dell'immagine desiderata
+                                ),
+                                Column(
+                                  children: [
+                                    Divider(),
+                                    Text(
+                                      'Time',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text('$formattedDateTime'),
+                                    Divider(),
+                                    Text(
+                                        'Orario previsto',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        )),
+                                    Text('$formattedTimeZone'),
+                                    Divider(),
+                                    Text(
+                                        'Temperature',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        )),
+                                    Text('${meteoData.hourly?.temperature2m?[index]}')
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        } else {
+                          return SizedBox.shrink(); // Nel caso la data sia null, la card sarà invisibile
+                        }
                       },
-                    ),
+                    )
+
+                    ,
                   )
 
                 ],
