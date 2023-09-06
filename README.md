@@ -1,6 +1,14 @@
 # openmeteo
 
-A new Flutter project.
+Targets:
+
+✅ 100% Implemented using Framework Flutter (Dart) 
+
+✅ Retrieve data from Open-Meteo API for a defined location 
+
+✅ For that location retrieving Forecast Data about next weather predictions
+
+✅ Inspired from layouts about Dribble with basic and Native design
 
 ## Getting Started
 
