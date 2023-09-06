@@ -17,6 +17,8 @@ Targets:
 
 ✅ Icons change during the day
 
+✅ Geolocalization to the current position through the floating button
+
 
 Package used:
 -
@@ -26,6 +28,8 @@ Package used:
 📝 _'package:http/http.dart'_ ---- Network call to make asynchronous call and fetch data into the open-meto API 
 
 📝 _'package:flutter/material.dart'_ ---- Access to all material components about Dart.
+
+📝 _'package:geolocator/geolocator.dart'_ ---- Access to all material components about Dart.
 
 
 
