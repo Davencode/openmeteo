@@ -1,24 +1,31 @@
-# openmeteo
+# Open-Meteo API project 🌤️
+
+This Project was developed only for personal purposes and to share some knowledge that I'm achieving during my experience in Flutter. 
 
 Targets:
-
+-
 ✅ 100% Implemented using Framework Flutter (Dart) 
 
-✅ Retrieve data from Open-Meteo API for a defined location 
+✅ Retrieve data from the open-source API "Open-Meteo" for a specific location 
 
-✅ For that location retrieving Forecast Data about next weather predictions
 
-✅ Inspired from layouts about Dribble with basic and Native design
+✅ For that location retrieving Forecast Data about next weather predictions about temperature 2m
 
-## Getting Started
+✅ A little bit inspired from layouts about Dribble with simple and basic design
 
-This project is a starting point for a Flutter application.
+✅ Data converter to format Data in JSON to the correct format
 
-A few resources to get you started if this is your first Flutter project:
+✅ Icons change during the day
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Package used:
+-
+
+📝 _'package:intl/intl.dart'_ ---- Retrieving methods to DateFormat and change current data into a correct way
+
+📝 _'package:http/http.dart'_ ---- Network call to make asynchronous call and fetch data into the open-meto API 
+
+📝 _'package:flutter/material.dart'_ ---- Access to all material components about Dart.
+
+
+
